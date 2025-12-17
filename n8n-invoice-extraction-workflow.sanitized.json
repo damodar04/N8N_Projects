@@ -1,0 +1,198 @@
+{
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            { "mode": "everyMinute" }
+          ]
+        },
+        "simple": false,
+        "filters": {
+          "q": "has:attachment",
+          "sender": "your-email@example.com"
+        },
+        "options": {
+          "downloadAttachments": true
+        }
+      },
+      "id": "gmail-trigger",
+      "name": "Receiving Invoices",
+      "type": "n8n-nodes-base.gmailTrigger",
+      "position": [-1400, 520],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "conditions": [
+            {
+              "leftValue": "={{ $input.item.binary.attachment_0.mimeType }}",
+              "rightValue": "application/pdf",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ]
+        }
+      },
+      "id": "filter-pdf",
+      "name": "Should Process Email?",
+      "type": "n8n-nodes-base.if",
+      "position": [-820, 520],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.cloud.llamaindex.ai/api/parsing/upload",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "accept", "value": "application/json" },
+            { "name": "Authorization", "value": "Bearer <LLAMA_CLOUD_API_KEY>" }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "parameterType": "formBinaryData",
+              "name": "file",
+              "inputDataFieldName": "attachment_0"
+            }
+          ]
+        }
+      },
+      "id": "llamaparse-upload",
+      "name": "Upload to LlamaParse",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [-540, 540],
+      "typeVersion": 4
+    },
+    {
+      "parameters": {
+        "url": "=https://api.cloud.llamaindex.ai/api/parsing/job/{{ $json.id }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "Authorization", "value": "Bearer <LLAMA_CLOUD_API_KEY>" }
+          ]
+        }
+      },
+      "id": "llamaparse-status",
+      "name": "Get Processing Status",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [-360, 540],
+      "typeVersion": 4
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.status }}",
+                    "rightValue": "SUCCESS",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ]
+              },
+              "renameOutput": true,
+              "outputKey": "SUCCESS"
+            }
+          ]
+        }
+      },
+      "id": "job-ready",
+      "name": "Is Job Ready?",
+      "type": "n8n-nodes-base.switch",
+      "position": [-200, 540],
+      "typeVersion": 3
+    },
+    {
+      "parameters": {
+        "url": "=https://api.cloud.llamaindex.ai/api/parsing/job/{{ $json.id }}/result/markdown",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "Authorization", "value": "Bearer <LLAMA_CLOUD_API_KEY>" }
+          ]
+        }
+      },
+      "id": "get-markdown",
+      "name": "Get Parsed Invoice Data",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [0, 420],
+      "typeVersion": 4
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Extract structured invoice data from the following markdown:\n<invoice>{{ $json.markdown }}</invoice>",
+        "hasOutputParser": true
+      },
+      "id": "llm-extract",
+      "name": "Apply Data Extraction Rules",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "position": [260, 440],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={{ $json.output }}"
+      },
+      "id": "map-output",
+      "name": "Map Output",
+      "type": "n8n-nodes-base.set",
+      "position": [600, 440],
+      "typeVersion": 3
+    },
+    {
+      "parameters": {
+        "resource": "sheet",
+        "operation": "append",
+        "sheetName": "Data"
+      },
+      "id": "append-sheet",
+      "name": "Append to Google Sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "position": [820, 440],
+      "typeVersion": 4
+    }
+  ],
+  "connections": {
+    "Receiving Invoices": {
+      "main": [[{ "node": "Should Process Email?", "type": "main", "index": 0 }]]
+    },
+    "Should Process Email?": {
+      "main": [[{ "node": "Upload to LlamaParse", "type": "main", "index": 0 }]]
+    },
+    "Upload to LlamaParse": {
+      "main": [[{ "node": "Get Processing Status", "type": "main", "index": 0 }]]
+    },
+    "Get Processing Status": {
+      "main": [[{ "node": "Is Job Ready?", "type": "main", "index": 0 }]]
+    },
+    "Is Job Ready?": {
+      "main": [[{ "node": "Get Parsed Invoice Data", "type": "main", "index": 0 }]]
+    },
+    "Get Parsed Invoice Data": {
+      "main": [[{ "node": "Apply Data Extraction Rules", "type": "main", "index": 0 }]]
+    },
+    "Apply Data Extraction Rules": {
+      "main": [[{ "node": "Map Output", "type": "main", "index": 0 }]]
+    },
+    "Map Output": {
+      "main": [[{ "node": "Append to Google Sheet", "type": "main", "index": 0 }]]
+    }
+  }
+}
