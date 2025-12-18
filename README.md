@@ -1,4 +1,4 @@
-# 📄 Automated Invoice Extraction with n8n, LlamaParse & DeepSeek
+#  Automated Invoice Extraction with n8n, LlamaParse & DeepSeek
 
 This repository contains an **end-to-end automated invoice processing workflow** built using **n8n**, **LlamaParse (LlamaIndex Cloud)**, and **DeepSeek LLMs**.
 
@@ -6,7 +6,7 @@ The system automatically reads invoice emails, extracts PDF attachments, parses 
 
 ---
 
-## 🔍 Problem Statement
+## Problem Statement
 
 Traditional PDF-to-text solutions fail when invoices contain:
 - **Tables and multi-line items**
@@ -18,7 +18,7 @@ This project solves these challenges using **cloud-grade document parsing** and 
 
 ---
 
-## 🧠 Solution Overview
+## Solution Overview
 
 The workflow follows these automated steps:
 1. **Listens** for invoice emails in Gmail.
@@ -30,7 +30,7 @@ The workflow follows these automated steps:
 
 ---
 
-## 🏗 Architecture Diagram
+## Architecture Diagram
 ```mermaid
 flowchart LR
     A[Gmail Trigger] --> B[PDF Filter]
@@ -45,17 +45,17 @@ flowchart LR
 
 ---
 
-## ✨ Key Features
+## Key Features
 
-- ✅ **Fully Automated**: No manual data entry required.
-- ✅ **High Accuracy**: Supports scanned and digital PDFs with complex tables.
-- ✅ **Structured Output**: Guaranteed JSON format for database/sheet integration.
-- ✅ **Cost-Effective**: Uses DeepSeek V3 for high-performance, low-cost extraction.
-- ✅ **Production Ready**: Includes duplicate prevention and error handling.
+-  **Fully Automated**: No manual data entry required.
+-  **High Accuracy**: Supports scanned and digital PDFs with complex tables.
+-  **Structured Output**: Guaranteed JSON format for database/sheet integration.
+-  **Cost-Effective**: Uses DeepSeek V3 for high-performance, low-cost extraction.
+-  **Production Ready**: Includes duplicate prevention and error handling.
 
 ---
 
-## 🛠 Technology Stack
+## Technology Stack
 
 | Layer | Tool |
 |-------|------|
@@ -67,7 +67,7 @@ flowchart LR
 
 ---
 
-## 📦 Extracted Invoice Fields
+## Extracted Invoice Fields
 
 The workflow extracts the following information automatically:
 
@@ -78,47 +78,47 @@ The workflow extracts the following information automatically:
 
 ---
 
-## 🚀 Getting Started
+## Getting Started
 
-### 1️⃣ Prerequisites
+### Prerequisites
 
 - n8n (Cloud or Self-Hosted).
 - Gmail & Google Sheets accounts.
 - LlamaIndex Cloud API Key.
 - DeepSeek API Key.
 
-### 2️⃣ Import Workflow
+### 2️Import Workflow
 
 1. Open your n8n instance.
 2. Go to **Workflows** → **Import from File**.
 3. Upload: `n8n-invoice-extraction-workflow.sanitized.json`.
 
-### 3️⃣ Configure Credentials
+### 3️Configure Credentials
 
 - **Gmail/Sheets**: Connect via OAuth2.
 - **DeepSeek**: Set Base URL to `https://api.deepseek.com/v1`.
 - **LlamaParse**: Add header `Authorization: Bearer <YOUR_API_KEY>`.
 
-### 4️⃣ Gmail Label Setup
+### 4️Gmail Label Setup
 
 Create a label in your Gmail account named: **`invoice synced`**. This is used to flag emails that have already been processed.
 
 ---
 
-## 🔐 Security Best Practices
+##  Security Best Practices
 
 - **Environment Variables**: Use n8n credentials for all API keys.
 - **Data Privacy**: Be mindful of PII (Personally Identifiable Information) in invoices when using cloud LLMs.
 
 ---
 
-## 👨‍💻 Author
+##  Author
 
 **Damodar Bhawsar**
 
 ---
 
-## 📝 License
+##  License
 
 This project is open source and available under the [MIT License](LICENSE).
 
