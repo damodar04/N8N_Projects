@@ -8,11 +8,12 @@ The system automatically reads invoice emails, extracts PDF attachments, parses 
 
 ## Problem Statement
 
-Traditional PDF-to-text solutions fail when invoices contain:
-- **Tables and multi-line items**
-- **Complex layouts**
-- **Scanned documents**
-- **Inconsistent formatting**
+Invoices often fail with traditional PDF/OCR tools due to:
+
+Complex tables and multi-line items
+Scanned or image-based PDFs
+Inconsistent vendor formats
+Manual data entry is slow, error-prone, and not scalable.
 
 This project solves these challenges using **cloud-grade document parsing** and **LLM-driven structured extraction**.
 
